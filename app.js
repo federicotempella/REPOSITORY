@@ -20,12 +20,13 @@
     try { return document.referrer ? new URL(document.referrer).origin : ""; }
     catch (e) { return ""; }
   }
+
   // Registrazione: usa la funzione trackEvent da tracking.js per inviare a Supabase.
   function track(eventName, docId) {
     var sessionId = sessionStorage.getItem('session_id') || 'session-' + Date.now();
     sessionStorage.setItem('session_id', sessionId);
     return trackEvent(eventName, lead, docId, source, referrerOrigin(), sessionId);
-  };
+  }
 
   // ---------- PAGINA DOCUMENTO: /<id>/ ----------
   function renderDoc(body) {

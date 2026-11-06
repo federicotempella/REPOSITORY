@@ -60,31 +60,5 @@
 
 <script src="../config.js"></script>
 <script src="../app.js"></script>
-
-<script>
-// Content page tracking
-document.addEventListener('DOMContentLoaded', function() {
-  const body = document.body;
-  const docId = body.getAttribute('data-doc-id');
-  const docUrl = body.getAttribute('data-doc-url');
-  const docTag = body.getAttribute('data-doc-tag');
-  const docTitle = body.getAttribute('data-doc-title');
-  const docDesc = body.getAttribute('data-doc-desc');
-  
-  const sessionId = sessionStorage.getItem('session_id') || 'session-' + Date.now();
-  sessionStorage.setItem('session_id', sessionId);
-  
-  // Track doc_open when page loads
-  trackEvent('doc_open', null, docId, 'github', document.referrer, sessionId);
-  
-  // Track doc_click when link is clicked
-  const docLink = document.getElementById('r-link');
-  if (docLink) {
-    docLink.addEventListener('click', function(e) {
-      trackEvent('doc_click', null, docId, 'github', document.referrer, sessionId);
-    });
-  }
-});
-</script>
 </body>
 </html>

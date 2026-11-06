@@ -28,39 +28,6 @@
     return trackEvent(eventName, lead, docId, source, referrerOrigin(), sessionId);
   }
 
-    var hook = cfg.webhook || "";
-    if (!hook || hook.indexOf("INCOLLA") === 0) {
-      return Promise.resolve({ sent: false, reason: "webhook non configurato", payload: payload });
-    }
-
-    var qs = Object.keys(payload).map(function (k) {
-      return encodeURIComponent(k) + "=" + encodeURIComponent(payload[k]);
-    }).join("&");
-    var url = hook + (hook.indexOf("?") > -1 ? "&" : "?") + qs;
-
-    return new Promise(function (resolve) {
-      var finished = false;
-      function finish(sent, reason) {
-        if (finished) return;
-        finished = true;
-        resolve({ sent: sent, reason: reason || "", payload: payload });
-      }
-      function pingImage() {
-        var img = new Image();
-        img.onload = img.onerror = function () { finish(true); };
-        img.src = url;
-      }
-      setTimeout(function () { finish(false, "timeout"); }, cfg.timeoutMs || 1200);
-      if (window.fetch) {
-        fetch(url, { method: "GET", mode: "no-cors", keepalive: true, cache: "no-store" })
-          .then(function () { finish(true); })
-          .catch(pingImage);
-      } else {
-        pingImage();
-      }
-    });
-  }
-
   // ---------- PAGINA DOCUMENTO: /<id>/ ----------
   function renderDoc(body) {
     var d = {

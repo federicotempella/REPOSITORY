@@ -16,5 +16,5 @@ window.SITE_CONFIG = {
   minDelayMs: 500,
 
   // false = non registra le visite all'hub senza identificativo del lead (?u=...). Meno rumore nei dati.
-  trackAnonymous: false
+  trackAnonymous: true
 };

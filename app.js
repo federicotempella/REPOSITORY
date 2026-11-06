@@ -23,15 +23,10 @@
 
   // Registrazione: richiesta GET verso il webhook n8n. Non richiede CORS e non blocca la pagina.
   function track(eventName, docId) {
-    var payload = {
-      event: eventName,
-      lead: lead,
-      doc: docId || "",
-      src: source,
-      ref: referrerOrigin(),
-      sid: sid,
-      ts: new Date().toISOString()
-    };
+    var sessionId = sessionStorage.getItem('session_id') || 'session-' + Date.now();
+    sessionStorage.setItem('session_id', sessionId);
+    return trackEvent(eventName, lead, docId, source, referrerOrigin(), sessionId);
+  }
 
     var hook = cfg.webhook || "";
     if (!hook || hook.indexOf("INCOLLA") === 0) {

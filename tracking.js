@@ -1,6 +1,6 @@
 // Configurazione Supabase
 const SUPABASE_URL = 'https://gtqeebtjsyutglsxmfmf.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd0cWVlYnRqc3l1dGdsc3hmZm1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM5NDQ0NzAsImV4cCI6MjEwOTUyMDQ3MH0.DgtcW8UO6z4Wv3iyWSw1RSTfxnEs_qi1Le0i-WDyT1E';
+const SUPABASE_KEY = 'sb_publishable_VRNtdasasO99nACvPVaJtA_Qa7nh0dG';
 const TABLE = 'content_tracking';
 
 // Funzione per inviare tracking a Supabase

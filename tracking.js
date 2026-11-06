@@ -4,7 +4,11 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const TABLE = 'content_tracking';
 
 // Funzione per inviare tracking a Supabase
+// Funzione per inviare tracking a Supabase
 async function trackEvent(event, lead, doc, src, referrer, session) {
+  // Aspetta 3 secondi per dare tempo all'utente di accettare il popup
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  
   const data = {
     timestamp_client: new Date().toISOString(),
     event,

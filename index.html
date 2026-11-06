@@ -21,62 +21,72 @@
 </head>
 <body>
 
-  <header class="top">
-    <div class="wrap">
-      <a class="brand" href="./" id="brand">Digital Technologies<span> · Risorse</span></a>
-      <a class="btn btn-small" href="https://www.digtechs.com/en/contacts#contact" target="_blank" rel="noopener">Parla con un esperto</a>
-    </div>
-  </header>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./" id="brand">Digital Technologies<span> · Risorse</span></a>
+    <a class="btn btn-small" href="https://www.digtechs.com/en/contacts#contact" target="_blank" rel="noopener">Parla con un esperto</a>
+  </div>
+</header>
 
-  <main>
-    <div id="view-hub" hidden>
-      <section class="hero">
-        <div class="wrap">
-          <span class="eyebrow">Finance &amp; Supply Chain</span>
-          <h1>Documenti e approfondimenti per il tuo team finance.</h1>
-          <p class="lead">Una raccolta dei materiali che condividiamo con i nostri interlocutori: white paper, presentazioni e link utili. Il catalogo viene aggiornato nel tempo.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="#documenti">Vai ai documenti</a>
-            <a class="btn btn-ghost" href="https://www.digtechs.com/" target="_blank" rel="noopener">Sito ufficiale</a>
-          </div>
+<main>
+  <div id="view-hub" hidden>
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow">Finance &amp; Supply Chain</span>
+        <h1>Documenti e approfondimenti per il tuo team finance.</h1>
+        <p class="lead">Una raccolta dei materiali che condividiamo con i nostri interlocutori: white paper, presentazioni e link utili. Il catalogo viene aggiornato nel tempo.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#documenti">Vai ai documenti</a>
+          <a class="btn btn-ghost" href="https://www.digtechs.com/" target="_blank" rel="noopener">Sito ufficiale</a>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="section" id="documenti">
-        <div class="wrap">
-          <h2>Documenti disponibili</h2>
-          <p class="section-sub">Seleziona il documento che vuoi aprire.</p>
-          <div class="grid" id="docs"></div>
+    <section class="section" id="documenti">
+      <div class="wrap">
+        <h2>Documenti disponibili</h2>
+        <p class="section-sub">Seleziona il documento che vuoi aprire.</p>
+        <div class="grid" id="docs"></div>
+      </div>
+    </section>
+
+    <section class="section section-cta">
+      <div class="wrap cta">
+        <div>
+          <h2>Vuoi approfondire con un esperto?</h2>
+          <p class="section-sub">Raccontaci il tuo contesto: costruiamo una conversazione tecnica e una demo sul tuo caso d'uso.</p>
         </div>
-      </section>
+        <a class="btn btn-primary" href="https://www.digtechs.com/en/contacts#contact" target="_blank" rel="noopener">Richiedi un confronto</a>
+      </div>
+    </section>
+  </div>
 
-      <section class="section section-cta">
-        <div class="wrap cta">
-          <div>
-            <h2>Vuoi approfondire con un esperto?</h2>
-            <p class="section-sub">Raccontaci il tuo contesto: costruiamo una conversazione tecnica e una demo sul tuo caso d'uso.</p>
-          </div>
-          <a class="btn btn-primary" href="https://www.digtechs.com/en/contacts#contact" target="_blank" rel="noopener">Richiedi un confronto</a>
-        </div>
-      </section>
-    </div>
+  <noscript>
+    <section class="redirect"><div class="wrap narrow">
+      <h1>JavaScript disattivato</h1>
+      <p class="lead lead-dark">Per vedere i documenti serve JavaScript. Attivalo nel browser e ricarica la pagina.</p>
+    </div></section>
+  </noscript>
+</main>
 
-    <noscript>
-      <section class="redirect"><div class="wrap narrow">
-        <h1>JavaScript disattivato</h1>
-        <p class="lead lead-dark">Per vedere i documenti serve JavaScript. Attivalo nel browser e ricarica la pagina.</p>
-      </div></section>
-    </noscript>
-  </main>
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Digital Technologies S.r.l. Società Benefit.</strong> Questa è una pagina di condivisione documenti, non il sito istituzionale. Il sito ufficiale è <a href="https://www.digtechs.com/" target="_blank" rel="noopener">digtechs.com</a>.</p>
+    <p class="foot-small">Questa pagina registra l'apertura dei documenti (identificativo del link, documento, data e ora) per sapere quali materiali sono utili. Informativa completa: <a href="https://www.digtechs.com/en/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+  </div>
+</footer>
 
-  <footer class="foot">
-    <div class="wrap">
-      <p><strong>Digital Technologies S.r.l. Società Benefit.</strong> Questa è una pagina di condivisione documenti, non il sito istituzionale. Il sito ufficiale è <a href="https://www.digtechs.com/" target="_blank" rel="noopener">digtechs.com</a>.</p>
-      <p class="foot-small">Questa pagina registra l'apertura dei documenti (identificativo del link, documento, data e ora) per sapere quali materiali sono utili. Informativa completa: <a href="https://www.digtechs.com/en/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
-    </div>
-  </footer>
+<script src="config.js"></script>
+<script src="app.js"></script>
 
-  <script src="config.js"></script>
-  <script src="app.js"></script>
+<script>
+// Hub page tracking - track when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  const sessionId = sessionStorage.getItem('session_id') || 'session-' + Date.now();
+  sessionStorage.setItem('session_id', sessionId);
+  
+  trackEvent('hub_view', null, 'hub-page', 'github', document.referrer, sessionId);
+});
+</script>
 </body>
 </html>

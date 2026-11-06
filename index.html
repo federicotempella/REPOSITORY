@@ -78,15 +78,5 @@
 
 <script src="config.js"></script>
 <script src="app.js"></script>
-
-<script>
-// Hub page tracking - track when page loads
-document.addEventListener('DOMContentLoaded', function() {
-  const sessionId = sessionStorage.getItem('session_id') || 'session-' + Date.now();
-  sessionStorage.setItem('session_id', sessionId);
-  
-  trackEvent('hub_view', null, 'hub-page', 'github', document.referrer, sessionId);
-});
-</script>
 </body>
 </html>

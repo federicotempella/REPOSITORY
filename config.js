@@ -7,7 +7,7 @@ window.SITE_CONFIG = {
 
   // URL del webhook n8n (nodo Webhook, metodo GET, URL di produzione).
   // Finché resta "INCOLLA_QUI..." nulla viene registrato.
-  webhook: "INCOLLA_QUI_URL_WEBHOOK_N8N",
+  webhook: "http://localhost:5678/webhook/dt-track",
 
   // Tempo massimo di attesa della registrazione prima di aprire comunque il documento (millisecondi).
   timeoutMs: 1200,

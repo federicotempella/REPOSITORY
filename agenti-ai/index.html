@@ -19,46 +19,72 @@
 </head>
 <body data-doc-id="agenti-ai" data-doc-url="https://canva.link/agentai" data-doc-tag="White paper" data-doc-title="Agenti AI per il team finance" data-doc-desc="Come gli agenti AI alleggeriscono le attività ripetitive, come la registrazione delle fatture, e liberano il team finance per il lavoro di analisi.">
 
-  <header class="top">
-    <div class="wrap">
-      <a class="brand" href="../">Digital Technologies<span> · Risorse</span></a>
-      <a class="btn btn-small" href="https://www.digtechs.com/en/contacts#contact" target="_blank" rel="noopener">Parla con un esperto</a>
-    </div>
-  </header>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../">Digital Technologies<span> · Risorse</span></a>
+    <a class="btn btn-small" href="https://www.digtechs.com/en/contacts#contact" target="_blank" rel="noopener">Parla con un esperto</a>
+  </div>
+</header>
 
-  <main>
-    <div id="view-redirect" hidden>
-      <section class="redirect">
-        <div class="wrap narrow">
-          <div class="spinner" aria-hidden="true"></div>
-          <span class="eyebrow eyebrow-dark" id="r-tag">White paper</span>
-          <h1 id="r-title">Agenti AI per il team finance</h1>
-          <p class="lead lead-dark" id="r-desc">Come gli agenti AI alleggeriscono le attività ripetitive, come la registrazione delle fatture, e liberano il team finance per il lavoro di analisi.</p>
-          <a class="btn btn-primary" id="r-link" href="https://canva.link/agentai">Apri il documento</a>
-          <p class="small">Se il documento non si apre da solo entro un secondo, usa il pulsante qui sopra.</p>
-          <p class="small"><a href="../" id="r-hub">Vedi tutti i documenti</a></p>
-          <pre id="debug" class="debug" hidden></pre>
-        </div>
-      </section>
-    </div>
+<main>
+  <div id="view-redirect" hidden>
+    <section class="redirect">
+      <div class="wrap narrow">
+        <div class="spinner" aria-hidden="true"></div>
+        <span class="eyebrow eyebrow-dark" id="r-tag">White paper</span>
+        <h1 id="r-title">Agenti AI per il team finance</h1>
+        <p class="lead lead-dark" id="r-desc">Come gli agenti AI alleggeriscono le attività ripetitive, come la registrazione delle fatture, e liberano il team finance per il lavoro di analisi.</p>
+        <a class="btn btn-primary" id="r-link" href="https://canva.link/agentai">Apri il documento</a>
+        <p class="small">Se il documento non si apre da solo entro un secondo, usa il pulsante qui sopra.</p>
+        <p class="small"><a href="../" id="r-hub">Vedi tutti i documenti</a></p>
+        <pre id="debug" class="debug" hidden></pre>
+      </div>
+    </section>
+  </div>
 
-    <noscript>
-      <section class="redirect"><div class="wrap narrow">
-        <h1>Agenti AI per il team finance</h1>
-        <p class="lead lead-dark">Come gli agenti AI alleggeriscono le attività ripetitive, come la registrazione delle fatture, e liberano il team finance per il lavoro di analisi.</p>
-        <a class="btn btn-primary" href="https://canva.link/agentai">Apri il documento</a>
-      </div></section>
-    </noscript>
-  </main>
+  <noscript>
+    <section class="redirect"><div class="wrap narrow">
+      <h1>Agenti AI per il team finance</h1>
+      <p class="lead lead-dark">Come gli agenti AI alleggeriscono le attività ripetitive, come la registrazione delle fatture, e liberano il team finance per il lavoro di analisi.</p>
+      <a class="btn btn-primary" href="https://canva.link/agentai">Apri il documento</a>
+    </div></section>
+  </noscript>
+</main>
 
-  <footer class="foot">
-    <div class="wrap">
-      <p><strong>Digital Technologies S.r.l. Società Benefit.</strong> Questa è una pagina di condivisione documenti, non il sito istituzionale. Il sito ufficiale è <a href="https://www.digtechs.com/" target="_blank" rel="noopener">digtechs.com</a>.</p>
-      <p class="foot-small">Questa pagina registra l'apertura dei documenti (identificativo del link, documento, data e ora) per sapere quali materiali sono utili. Informativa completa: <a href="https://www.digtechs.com/en/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
-    </div>
-  </footer>
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Digital Technologies S.r.l. Società Benefit.</strong> Questa è una pagina di condivisione documenti, non il sito istituzionale. Il sito ufficiale è <a href="https://www.digtechs.com/" target="_blank" rel="noopener">digtechs.com</a>.</p>
+    <p class="foot-small">Questa pagina registra l'apertura dei documenti (identificativo del link, documento, data e ora) per sapere quali materiali sono utili. Informativa completa: <a href="https://www.digtechs.com/en/privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>.</p>
+  </div>
+</footer>
 
-  <script src="../config.js"></script>
-  <script src="../app.js"></script>
+<script src="../config.js"></script>
+<script src="../app.js"></script>
+
+<script>
+// Content page tracking
+document.addEventListener('DOMContentLoaded', function() {
+  const body = document.body;
+  const docId = body.getAttribute('data-doc-id');
+  const docUrl = body.getAttribute('data-doc-url');
+  const docTag = body.getAttribute('data-doc-tag');
+  const docTitle = body.getAttribute('data-doc-title');
+  const docDesc = body.getAttribute('data-doc-desc');
+  
+  const sessionId = sessionStorage.getItem('session_id') || 'session-' + Date.now();
+  sessionStorage.setItem('session_id', sessionId);
+  
+  // Track doc_open when page loads
+  trackEvent('doc_open', null, docId, 'github', document.referrer, sessionId);
+  
+  // Track doc_click when link is clicked
+  const docLink = document.getElementById('r-link');
+  if (docLink) {
+    docLink.addEventListener('click', function(e) {
+      trackEvent('doc_click', null, docId, 'github', document.referrer, sessionId);
+    });
+  }
+});
+</script>
 </body>
 </html>

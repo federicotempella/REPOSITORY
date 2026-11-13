@@ -186,3 +186,33 @@ Correlare con la tabella prospects in Supabase
 Identificare segnali di interesse (lead caldi, tiepidi, potenziali)
 Suggerire azioni di follow-up
 ```
+11. Backlog
+Tracciamento del percorso tra più documenti
+
+Stato: da fare. Quando: appena ci sono almeno due documenti pubblicati. Con un solo documento un percorso non esiste, quindi oggi non si può né implementare né provare.
+
+Situazione attuale. Ogni arrivo su una pagina del sito è un evento (hub_view, doc_open, doc_click) con lead, doc e orario. La sequenza dei documenti consultati da un lead si ricostruisce ordinando gli eventi per orario. Non sono tracciati:
+
+tutto ciò che avviene dopo il redirect (tempo, pagine viste e scorrimento stanno su Canva, che la pagina non può leggere);
+il tasto indietro: non genera eventi, e l'hub ripristinato dal browser può non rieseguire gli script;
+la continuità della visita: session cambia a ogni pagina caricata.
+
+Interventi, dal più economico:
+
+#	Intervento	Cosa risolve	Note
+1	Identificativo di visita salvato nel browser (sessionStorage) e usato in tutti gli eventi	Hub e documenti risultano la stessa visita	Una modifica in app.js
+2	Evento hub_return quando l'hub viene ripristinato con il tasto indietro (evento pageshow con persisted)	Il ritorno dal documento all'hub	Il comportamento cambia per browser: da provare su desktop e mobile
+3	Evento all'uscita dall'hub con la durata	Tempo passato sull'hub	Solo l'hub, non i documenti
+4	Documento incorporato nella pagina, con pulsante "Torna ai documenti" e misura del tempo di visibilità	Tempo sul documento	Cambia l'esperienza del destinatario. Per Canva non si vedrebbero comunque le pagine lette. Da valutare solo se il tempo di lettura serve davvero. Non verificato il comportamento nell'app mobile di LinkedIn
+
+Prima di implementare, test di riferimento con un lead di prova (test_percorso1):
+
+Apri …/<sito>/?u=test_percorso1, clicca un documento, torna indietro con il tasto del browser, riclicca, poi apri il link diretto …/<id>/?u=test_percorso1.
+Leggi le righe di quel lead in ordine di orario (event, doc, src, session, orario).
+Ripeti da desktop e da telefono.
+Confronta con la sequenza attesa e annota cosa manca.
+
+Dopo l'implementazione:
+
+Aggiorna la riga di informativa nel footer (build.py e index.html): oggi dichiara solo l'apertura dei documenti, non tempi e ritorni. Fai ricontrollare il testo a chi gestisce il GDPR.
+Aggiorna Claude_TrackingDoc.md con le regole per leggere un percorso (per esempio come trattare gli eventi ravvicinati della stessa visita).

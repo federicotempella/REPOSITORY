@@ -1,82 +1,92 @@
-Hub documenti con tracciamento — istruzioni operative
+# Hub documenti con tracciamento — istruzioni operative
+
 Pagina statica su GitHub Pages che condivide documenti (Canva, PDF, link) e registra chi li apre. I dati vengono salvati direttamente in Supabase, e un workflow n8n Cloud permette di interrogarli.
 
-Sito: https://federicotempella.github.io/REPOSITORY/
-Hub (elenco documenti): https://federicotempella.github.io/REPOSITORY/?u=<id-lead>
-Link di un documento: https://federicotempella.github.io/REPOSITORY/<id-documento>/?u=<id-lead>
+- Sito: `https://federicotempella.github.io/REPOSITORY/`
+- Hub (elenco documenti): `https://federicotempella.github.io/REPOSITORY/?u=<id-lead>`
+- Link di un documento: `https://federicotempella.github.io/REPOSITORY/<id-documento>/?u=<id-lead>`
+
 Questo file sta in un repository pubblico. Non scriverci mai URL riservati, password o elenchi di lead.
 
-1. Come funziona
-Il lead clicca il link …/agenti-ai/?u=silvia-bordo-0a2885144.
-La pagina legge u, invia l'evento a Supabase tramite tracking.js e dopo circa mezzo secondo apre il documento (Canva, PDF…).
-I dati vengono salvati in Supabase nella tabella content_tracking.
+## 1. Come funziona
+
+Il lead clicca il link `…/agenti-ai/?u=silvia-bordo-0a2885144`.
+La pagina legge `u`, invia l'evento a Supabase tramite `tracking.js` e dopo circa mezzo secondo apre il documento (Canva, PDF…).
+I dati vengono salvati in Supabase nella tabella `content_tracking`.
 Un workflow n8n Cloud permette di interrogare i dati per analisi e correlazione con i contatti.
 
-Architettura:
-
+**Architettura:**
 GitHub Pages → tracking.js → Supabase (content_tracking)
-                              ↓
-                      n8n Cloud (content-tracking-reader)
-                              ↓
-                      Claude Code mostra dati
+↓
+n8n Cloud (content-tracking-reader)
+↓
+Claude Code mostra dati
+
 Perché una pagina per documento: la card che LinkedIn mostra nel messaggio viene costruita dalla pagina a cui punta il link. Con un redirect HTTP (Dub, bit.ly) LinkedIn seguiva il redirect e la card portava direttamente a Canva, saltando il tracciamento. Qui la pagina risponde normalmente e il redirect lo fa il JavaScript, che il crawler di LinkedIn non esegue.
 
-Eventi registrati:
+**Eventi registrati:**
 
-event	Quando
-doc_open	Il lead apre direttamente il link del documento
-doc_click	Il lead arriva al documento dall'hub (il link contiene s=hub)
-hub_view	Il lead apre l'hub. Senza u non viene registrato
-Tracking multi-contenuto: Se un lead atterra sull'hub e clicca su più documenti, ogni click viene tracciato separatamente, permettendo di vedere l'intero percorso di navigazione.
+| event | Quando |
+|-------|--------|
+| `doc_open` | Il lead apre direttamente il link del documento |
+| `doc_click` | Il lead arriva al documento dall'hub (il link contiene `s=hub`) |
+| `hub_view` | Il lead apre l'hub. Senza `u` non viene registrato |
 
-2. File del progetto
-File	A cosa serve	Lo modifichi?
-documents.json	Elenco dei documenti e indirizzo del sito	Sì, a ogni nuovo documento
-tracking.js	Invia eventi a Supabase (credenziali inline)	Una volta sola (per credenziali)
-build.py	Genera le pagine dei documenti dai dati di documents.json	No, lo esegui
-<id>/index.html	Pagina del singolo documento (generata da build.py)	No
-cards/<id>.png	Immagine 1200×630 mostrata nella card	Sì, una per documento
-cards/default.png	Immagine di riserva e dell'hub	Raramente
-index.html, app.js, style.css	Hub, logica, grafica	No
-Claude_TrackingDoc.md	Documentazione per l'agente Claude	No (ma tienilo nel repo per riferimento)
-3. Attivazione iniziale (una sola volta)
-3.1 GitHub Pages
+**Tracking multi-contenuto:** Se un lead atterra sull'hub e clicca su più documenti, ogni click viene tracciato separatamente, permettendo di vedere l'intero percorso di navigazione.
+
+## 2. File del progetto
+
+| File | A cosa serve | Lo modifichi? |
+|------|---------------|---------------|
+| `documents.json` | Elenco dei documenti e indirizzo del sito | Sì, a ogni nuovo documento |
+| `tracking.js` | Invia eventi a Supabase (credenziali inline) | Una volta sola (per credenziali) |
+| `build.py` | Genera le pagine dei documenti dai dati di `documents.json` | No, lo esegui |
+| `<id>/index.html` | Pagina del singolo documento (generata da `build.py`) | No |
+| `cards/<id>.png` | Immagine 1200×630 mostrata nella card | Sì, una per documento |
+| `cards/default.png` | Immagine di riserva e dell'hub | Raramente |
+| `index.html`, `app.js`, `style.css` | Hub, logica, grafica | No |
+| `Claude_TrackingDoc.md` | Documentazione per l'agente Claude | No (ma tienilo nel repo per riferimento) |
+
+## 3. Attivazione iniziale (una sola volta)
+
+### 3.1 GitHub Pages
 Repository → Settings → Pages.
-Source: Deploy from a branch, branch main, cartella / (root). Salva.
-Dopo 1-2 minuti il sito risponde su https://federicotempella.github.io/REPOSITORY/.
+Source: Deploy from a branch, branch `main`, cartella `/ (root)`. Salva.
+Dopo 1-2 minuti il sito risponde su `https://federicotempella.github.io/REPOSITORY/`.
 Gli indirizzi sono sensibili a maiuscole e minuscole: scrivili sempre come sopra.
 
-3.2 Supabase
-Crea un progetto Supabase e crea la tabella content_tracking con le colonne:
-id, timestamp_server, timestamp_client, event, lead, doc, src, referrer, session, user_agent, probable_bot
+### 3.2 Supabase
+Crea un progetto Supabase e crea la tabella `content_tracking` con le colonne:
+`id`, `timestamp_server`, `timestamp_client`, `event`, `lead`, `doc`, `src`, `referrer`, `session`, `user_agent`, `probable_bot`
 
 Abilita RLS con policy per INSERT e SELECT anon.
 
-3.3 tracking.js
-Nel file tracking.js, inserisci le credenziali Supabase:
+### 3.3 tracking.js
+Nel file `tracking.js`, inserisci le credenziali Supabase:
+- `SUPABASE_URL`: URL del progetto Supabase
+- `SUPABASE_KEY`: Publishable API key (anon/public key)
 
-SUPABASE_URL: URL del progetto Supabase
-SUPABASE_KEY: Publishable API key (anon/public key)
-3.4 Workflow n8n Cloud
-In n8n Cloud, crea il workflow content-tracking-reader:
+### 3.4 Workflow n8n Cloud
+In n8n Cloud, crea il workflow `content-tracking-reader`:
+- Webhook per interrogare i dati
+- Nodo Postgres per leggere da Supabase
+- Nodo Log per registrare le query
+- Endpoint per Claude Code
 
-Webhook per interrogare i dati
-Nodo Postgres per leggere da Supabase
-Nodo Log per registrare le query
-Endpoint per Claude Code
 Configura le credenziali Supabase nel nodo Postgres.
 
-3.5 Test di attivazione
-Apri …/agenti-ai/?u=test1&debug=1 e controlla che compaia una riga in Supabase.
+### 3.5 Test di attivazione
+Apri `…/agenti-ai/?u=test1` e controlla che compaia una riga in Supabase.
 
-4. Aggiungere un nuovo documento
+## 4. Aggiungere un nuovo documento
+
 Prepara il documento:
+- Canva: usa il link pubblico di visualizzazione (`canva.link/...`)
+- PDF: caricalo in una cartella `docs/` del repository. Il repository è pubblico: chi conosce l'indirizzo del file lo apre senza passare dalla pagina e senza essere tracciato. Niente materiale riservato.
+- Link esterno: l'URL completo
 
-Canva: usa il link pubblico di visualizzazione (canva.link/...)
-PDF: caricalo in una cartella docs/ del repository. Il repository è pubblico: chi conosce l'indirizzo del file lo apre senza passare dalla pagina e senza essere tracciato. Niente materiale riservato.
-Link esterno: l'URL completo
-Aggiungi un blocco in documents.json, dentro documents, separato da una virgola:
-
+Aggiungi un blocco in `documents.json`, dentro `documents`, separato da una virgola:
+```json
 {
   "id": "brochure-p2p",
   "tag": "PDF",
@@ -84,6 +94,7 @@ Aggiungi un blocco in documents.json, dentro documents, separato da una virgola:
   "description": "Panoramica della soluzione in 4 pagine.",
   "url": "docs/brochure-p2p.pdf"
 }
+
 id: solo minuscole, numeri e trattini. Finisce nel link e non va più cambiato.
 title e description sono anche il testo della card in LinkedIn. Titolo breve, descrizione sotto i 200 caratteri circa.
 Per un link esterno o Canva, url è l'indirizzo completo (https://…).
@@ -125,11 +136,11 @@ Tracking multi-contenuto: Apri l'hub, clicca su un documento, torna indietro, cl
 
 7. Leggere i risultati
 Tramite Supabase:
-
 SELECT * FROM public.content_tracking 
 WHERE probable_bot = false 
 ORDER BY timestamp_server DESC 
 LIMIT 100;
+
 Tramite n8n Cloud:
 Chiama il webhook content-tracking-reader con parametri:
 
@@ -143,16 +154,19 @@ Vedi Claude_TrackingDoc.md per i comandi dell'agente:
 "Mostrami il tracking per il lead [NOME]"
 "Analizza i segnali di interesse"
 "Correla con i contatti nel database prospects"
+
 8. Se qualcosa non funziona
-Sintomo	Causa probabile	Cosa fare
-Il sito dà 404	Pages non attivo, o indirizzo con maiuscole diverse	Sezione 3.1, controlla l'indirizzo esatto
-Un documento nuovo dà 404	Cartella <id>/ non caricata, o Pages in pubblicazione	Controlla che <id>/index.html sia nel repository, aspetta 2 minuti
-L'hub non mostra il documento	Manca il blocco in documents.json o c'è un errore di sintassi (virgola)	Valida il file su un validatore JSON
-Il documento si apre, nessuna riga in Supabase	tracking.js non caricato, credenziali sbagliate, o ad blocker	Controlla console del browser per errori "Tracking error"
-Riga con lead vuoto	Il link è arrivato senza ?u=	Controlla il template del messaggio
-lead tronco (es. Niccol)	Caratteri non ammessi eliminati	Usa lo slug (publicId) invece di firstName_lastName
-La card punta a Canva	Sul link c'è ancora un redirect (Dub, bit.ly), o il tag og:url è stato aggiunto	Usa direttamente l'indirizzo della pagina, senza accorciatori
-La card è vuota o vecchia	Cache di LinkedIn, og:image con indirizzo errato o immagine troppo pesante	Controlla l'indirizzo dell'immagine aprendolo nel browser; peso sotto 1 MB
+| Sintomo | Causa probabile | Cosa fare |
+| --- | --- | --- |
+| Il sito dà 404 | Pages non attivo, o indirizzo con maiuscole diverse | Sezione 3.1, controlla l'indirizzo esatto |
+| Un documento nuovo dà 404 | Cartella <id>/ non caricata, o Pages in pubblicazione | Controlla che <id>/index.html sia nel repository, aspetta 2 minuti |
+| L'hub non mostra il documento | Manca il blocco in documents.json o c'è un errore di sintassi (virgola) | Valida il file su un validatore JSON |
+| Il documento si apre, nessuna riga in Supabase | tracking.js non caricato, credenziali sbagliate, o ad blocker | Controlla console del browser per errori "Tracking error" |
+| Riga con lead vuoto | Il link è arrivato senza ?u= | Controlla il template del messaggio |
+| lead tronco (es. Niccol) | Caratteri non ammessi eliminati | Usa lo slug (publicId) invece di firstName_lastName |
+| La card punta a Canva | Sul link c'è ancora un redirect (Dub, bit.ly), o il tag og:url è stato aggiunto | Usa direttamente l'indirizzo della pagina, senza accorciatori |
+| La card è vuota o vecchia | Cache di LinkedIn, og:image con indirizzo errato o immagine troppo pesante | Controlla l'indirizzo dell'immagine aprendolo nel browser; peso sotto 1 MB |
+
 9. Limiti e privacy
 Le credenziali Supabase sono in tracking.js, leggibile da chiunque. Considera i dati come indicativi, non come prova.
 Il repository è pubblico (richiesto da Pages gratuito). Nel repository non vanno elenchi di lead, esportazioni LinkedIn Helper o materiale riservato.
@@ -171,3 +185,4 @@ Filtrare per lead, documento, periodo
 Correlare con la tabella prospects in Supabase
 Identificare segnali di interesse (lead caldi, tiepidi, potenziali)
 Suggerire azioni di follow-up
+```

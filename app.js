@@ -190,4 +190,14 @@
       .then(function (j) { renderHub((j && j.documents) || []); })
       .catch(function () { renderHub([]); });
   }
+    // ---------- clic verso il sito ufficiale ----------
+  // Segnale forte: non è "ha aperto", è "ha chiesto un contatto".
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest ? e.target.closest("a[href*='digtechs.com']") : null;
+    if (!a) return;
+    var href = a.getAttribute("href") || "";
+    var quale = href.indexOf("contacts") > -1 ? "cta-contatto" : "cta-sito";
+    var pagina = document.body.getAttribute("data-doc-id") || "hub";
+    track("cta_click", quale + ":" + pagina);
+  }, true);
 })();

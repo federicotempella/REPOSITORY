@@ -196,7 +196,10 @@
     var a = e.target.closest ? e.target.closest("a[href*='digtechs.com']") : null;
     if (!a) return;
     var href = a.getAttribute("href") || "";
-    var quale = href.indexOf("contacts") > -1 ? "cta-contatto" : "cta-sito";
+    var quale = href.indexOf("contacts") > -1 ? "cta-contatto"
+              : href.indexOf("privacy") > -1 ? "footer-privacy"
+              : a.className.indexOf("btn") > -1 ? "cta-sito"
+              : "footer-sito";
     var pagina = document.body.getAttribute("data-doc-id") || "hub";
     track("cta_click", quale + ":" + pagina);
   }, true);

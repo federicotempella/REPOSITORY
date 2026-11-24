@@ -38,5 +38,6 @@ async function trackEvent(event, lead, doc, src, referrer, session) {
     }
   } catch (error) {
     console.error('Tracking error:', error);
+    return { ok: false, error: String(error) };            // <-- e questa
   }
 }

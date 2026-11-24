@@ -190,6 +190,25 @@ durata zero.
 Vale solo per i documenti ospitati su Canva. Per i contenuti che sono link al sito
 aziendale la durata la misura chi serve quelle pagine: o si chiedono le analitiche
 di digtechs.com, o resta solo il clic verificato.
+
+### Importare l'export Canva in Supabase
+
+I CSV non restano sul disco: si caricano in `public.canva_analytics`, così Claude
+Code li incrocia da solo.
+
+1. Canva → documento → Analisi → Scarica CSV
+2. Supabase → Table Editor → `canva_staging` → Import data from CSV (il file così
+   com'è, senza toccare le intestazioni)
+3. Lancia lo script di conversione cambiando le due righe in cima: lo slug del
+   documento e il nome del file
+4. Lo script svuota `canva_staging` alla fine
+5. Verifica: `select doc, count(*), count(*) filter (where durata_sec > 0) from canva_analytics group by doc;`
+
+Poi la vista `v_letture_verificate` unisce tracking e Canva per orario e dice chi
+ha letto davvero.
+
+Cadenza consigliata: a ogni match dei lead. Canva non ha API e lo storico
+potrebbe non restare disponibile a lungo.
 8. Se qualcosa non funziona
 | Sintomo | Causa probabile | Cosa fare |
 | --- | --- | --- |

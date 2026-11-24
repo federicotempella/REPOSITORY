@@ -173,7 +173,23 @@ Vedi Claude_TrackingDoc.md per i comandi dell'agente:
 "Mostrami il tracking per il lead [NOME]"
 "Analizza i segnali di interesse"
 "Correla con i contatti nel database prospects"
+## 7bis. Durata della lettura (solo contenuti su Canva)
 
+Il tracking registra chi apre, non quanto resta: dopo il redirect la persona è su
+Canva. La durata si prende dall'export Canva e si incrocia per orario.
+
+1. Canva → documento → Analisi → Scarica CSV
+2. Supabase: eventi di quel documento nello stesso periodo
+3. Accoppiare per orario: **Canva è in ora locale, Supabase in UTC** (un'ora di
+   differenza d'inverno, due d'estate), tolleranza ±2 minuti
+
+**Durata 0 e 0 pagine = apertura automatica, non lettura.** Nell'export del
+24/11/2026 era il 77% delle visite, tutte da desktop. Nessuna visita mobile aveva
+durata zero.
+
+Vale solo per i documenti ospitati su Canva. Per i contenuti che sono link al sito
+aziendale la durata la misura chi serve quelle pagine: o si chiedono le analitiche
+di digtechs.com, o resta solo il clic verificato.
 8. Se qualcosa non funziona
 | Sintomo | Causa probabile | Cosa fare |
 | --- | --- | --- |

@@ -26,11 +26,16 @@ Perché una pagina per documento: la card che LinkedIn mostra nel messaggio vien
 
 **Eventi registrati:**
 
-| event | Quando |
-|-------|--------|
-| `doc_open` | Il lead apre direttamente il link del documento |
-| `doc_click` | Il lead arriva al documento dall'hub (il link contiene `s=hub`) |
-| `hub_view` | Il lead apre l'hub. Senza `u` non viene registrato |
+| event | Quando | Affidabilità |
+|-------|--------|--------------|
+| `doc_click` | Il lead arriva al documento dall'hub (`s=hub`) | **Alta** — unico segnale di lettura |
+| `cta_click` | Clic verso il sito ufficiale o la pagina contatti | **Alta** — intento commerciale |
+| `hub_view` | Apertura dell'hub | Bassa — lo produce anche LinkedHelper |
+| `doc_open` | Apertura diretta del documento | Bassa — non protetta dai filtri |
+
+**Dal 24/11/2026 nei messaggi va solo il link all'hub.** LinkedHelper carica il
+link all'invio ed esegue il JavaScript: un link diretto produce un `doc_open`
+falso. I filtri in `app.js` proteggono solo il percorso hub → documento.
 
 **Tracking multi-contenuto:** Se un lead atterra sull'hub e clicca su più documenti, ogni click viene tracciato separatamente, permettendo di vedere l'intero percorso di navigazione.
 
@@ -39,13 +44,14 @@ Perché una pagina per documento: la card che LinkedIn mostra nel messaggio vien
 | File | A cosa serve | Lo modifichi? |
 |------|---------------|---------------|
 | `documents.json` | Elenco dei documenti e indirizzo del sito | Sì, a ogni nuovo documento |
-| `tracking.js` | Invia eventi a Supabase (credenziali inline) | Una volta sola (per credenziali) |
+| `tracking.js` | Invia eventi a Supabase (credenziali inline). L'attesa prima dell'invio è in app.js, non qui | Una volta sola (per credenziali) |
 | `build.py` | Genera le pagine dei documenti dai dati di `documents.json` | No, lo esegui |
 | `<id>/index.html` | Pagina del singolo documento (generata da `build.py`) | No |
 | `cards/<id>.png` | Immagine 1200×630 mostrata nella card | Sì, una per documento |
 | `cards/default.png` | Immagine di riserva e dell'hub | Raramente |
 | `index.html`, `app.js`, `style.css` | Hub, logica, grafica | No |
 | `Claude_TrackingDoc.md` | Documentazione per l'agente Claude | No (ma tienilo nel repo per riferimento) |
+| `app.js` | Logica hub e documenti, filtri anti-apertura automatica (`ATTESA`, `FINESTRA_BURST`) | Solo per tarare i filtri |
 
 ## 3. Attivazione iniziale (una sola volta)
 
@@ -111,11 +117,16 @@ Il parametro u è l'identificativo del lead. Valori ammessi: lettere, numeri, pu
 
 Template per LinkedIn Helper (blocco IF/THEN/ELSE):
 
-IF {publicId} → THEN https://federicotempella.github.io/REPOSITORY/agenti-ai/?u={publicId}
+IF {publicId} → THEN https://federicotempella.github.io/REPOSITORY/?u={publicId}
 ELSE (lascia vuoto il testo) con un IF annidato:
-IF {lastName} → THEN https://federicotempella.github.io/REPOSITORY/agenti-ai/?u={firstName}_{lastName}
-ELSE → https://federicotempella.github.io/REPOSITORY/agenti-ai/
-I campi "Optional text" restano vuoti, altrimenti il testo si aggiunge dopo il link. Il link deve comparire una volta sola nel messaggio.
+IF {lastName} → THEN https://federicotempella.github.io/REPOSITORY/?u={firstName}_{lastName}
+ELSE → https://federicotempella.github.io/REPOSITORY/
+
+Dopo la variabile ci deve essere uno spazio o un a capo prima del testo
+successivo, altrimenti il link ingloba la parola dopo (`Ca-SharmaJust`).
+
+Nel testo del messaggio si indirizza al contenuto senza linkarlo direttamente:
+"trovi il webcast sugli AI Agents nella pagina risorse".
 
 Cosa vedrai nella colonna lead in Supabase:
 
@@ -135,14 +146,22 @@ In Supabase deve comparire una riga per quel clic.
 Tracking multi-contenuto: Apri l'hub, clicca su un documento, torna indietro, clicca su un altro. Supabase registrerà ogni click separatamente.
 
 7. Leggere i risultati
-Tramite Supabase:
-SELECT * FROM public.content_tracking 
-WHERE probable_bot = false 
-ORDER BY timestamp_server DESC 
+-- letture vere (dal 24/11/2026)
+SELECT lead, doc, timestamp_server, referrer
+FROM public.content_tracking
+WHERE event = 'doc_click' AND src = 'hub' AND lead <> ''
+  AND timestamp_server >= '2026-11-24'
+ORDER BY timestamp_server DESC;
+
+-- tutto, inclusi i segnali deboli
+SELECT * FROM public.content_tracking
+WHERE probable_bot = false
+ORDER BY timestamp_server DESC
 LIMIT 100;
 
 Tramite n8n Cloud:
-Chiama il webhook content-tracking-reader con parametri:
+Chiama il webhook content-tracking-reader, solo in GET e con header
+`X-Api-Key`, con parametri:
 
 lead: Filtra per lead specifico
 doc: Filtra per documento specifico
@@ -172,6 +191,10 @@ Le credenziali Supabase sono in tracking.js, leggibile da chiunque. Considera i 
 Il repository è pubblico (richiesto da Pages gratuito). Nel repository non vanno elenchi di lead, esportazioni LinkedIn Helper o materiale riservato.
 Dati personali: Registri chi apre cosa: in Supabase ci sono slug del profilo, orario e user-agent. L'indirizzo IP non viene salvato. Fai verificare a chi gestisce il GDPR in DT la riga di informativa nel footer e per quanto tempo conservare i dati.
 noindex: Le pagine escludono i motori di ricerca.
+L'indirizzo IP non viene salvato, e questo impedisce di distinguere le aperture
+automatiche dalla stessa macchina. Registrarlo richiede una Supabase Edge
+Function (vedi backlog), che chiuderebbe anche la scrittura pubblica sulla
+tabella.
 10. Manutenzione
 Cambiare le credenziali Supabase: modifica tracking.js e caricalo.
 Sostituire un documento senza cambiare il link: mantieni l'id, cambia url in documents.json, lancia build.py e ricarica documents.json e <id>/index.html.
@@ -216,3 +239,21 @@ Dopo l'implementazione:
 
 Aggiorna la riga di informativa nel footer (build.py e index.html): oggi dichiara solo l'apertura dei documenti, non tempi e ritorni. Fai ricontrollare il testo a chi gestisce il GDPR.
 Aggiorna Claude_TrackingDoc.md con le regole per leggere un percorso (per esempio come trattare gli eventi ravvicinati della stessa visita).
+
+### Edge Function con registrazione IP
+
+Stato: da fare. Risolve due problemi insieme.
+
+1. **Scrittura pubblica.** Oggi la policy INSERT su `content_tracking` è aperta
+   al ruolo anon senza condizioni: chiunque abbia la chiave pubblica, leggibile
+   nel sorgente, può scrivere righe finte. La SELECT pubblica è già stata chiusa
+   il 20/11/2026.
+2. **Aperture automatiche.** Senza IP non si distingue un'apertura vera da una
+   generata dalla macchina che invia i messaggi. È il controllo più solido
+   disponibile; i filtri JavaScript del 24/11/2026 coprono i casi osservati ma
+   sono aggirabili.
+
+Come: una Edge Function `track-event` in TypeScript/Deno che riceve l'evento,
+valida lo slug del documento, registra l'IP e scrive con chiave service-role
+mai esposta al browser. Poi si chiude l'INSERT diretto e si punta `tracking.js`
+alla funzione.

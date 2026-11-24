@@ -41,7 +41,7 @@
 
   var CHIAVE_BURST = "dt_caricamenti";
   var FINESTRA_BURST = 5000;   // ms entro cui due aperture sono "insieme"
-  var ATTESA = 3000;           // ms di permanenza prima di registrare
+  var ATTESA = 1000;           // ms di permanenza prima di registrare
 
   function segnalaCaricamento(docId) {
     try {
